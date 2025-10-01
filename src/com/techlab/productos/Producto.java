@@ -1,10 +1,19 @@
 package com.techlab.productos;
 
+import java.util.UUID;
+
 public class Producto {
     private String nombre;
     private double precio;
     private int stock;
-    private int id;
+    private String id;
+
+    public Producto(String nombre, double precio, int stock) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.stock = stock;
+        this.id = UUID.randomUUID().toString();
+    }
 
     public String getNombre() {
         return nombre;
@@ -34,11 +43,8 @@ public class Producto {
         this.stock = stock;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 }
