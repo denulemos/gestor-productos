@@ -8,6 +8,11 @@ public class Orden {
     private int id;
     private ArrayList<Producto> productos;
 
+    public Orden(int id, ArrayList<Producto> productos) {
+        this.id = id;
+        this.productos = productos;
+    }
+
     public int getId() {
         return id;
     }
