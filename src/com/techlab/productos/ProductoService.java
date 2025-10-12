@@ -1,5 +1,8 @@
 package com.techlab.productos;
 
+import com.techlab.excepciones.EntradaInvalidaException;
+import com.techlab.excepciones.ProductoNoEncontradoException;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -9,21 +12,36 @@ public class ProductoService {
     private ArrayList<Producto> productos = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
-    public Optional<Producto> buscarProducto() {
-        System.out.println("¿Te gustaría buscar producto por ID o Nombre?");
+    public Optional<Producto> buscarProducto() throws ProductoNoEncontradoException {
+        this.listarProductos();
+        System.out.println("¿Te gustaría seleccionar producto por ID o Nombre?");
         System.out.println("1: Nombre, 2: ID");
 
         int opcion;
         try {
             opcion = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            System.out.println("⚠️ Entrada inválida. Por defecto se usará búsqueda por ID.");
+            System.out.println("Entrada inválida. Por defecto se usará búsqueda por ID.");
             opcion = 2;
         }
 
         Optional<Producto> resultado = switch (opcion) {
-            case 1 -> this.buscarProductoPorNombre();
-            case 2 -> this.buscarProductoPorId();
+            case 1 -> {
+                try {
+                    yield this.buscarProductoPorNombre();
+                } catch (ProductoNoEncontradoException e) {
+                    System.out.println(e.getMessage());
+                    yield Optional.empty();
+                }
+            }
+            case 2 -> {
+                try {
+                    yield this.buscarProductoPorId();
+                } catch (ProductoNoEncontradoException e) {
+                    System.out.println(e.getMessage());
+                    yield Optional.empty();
+                }
+            }
             default -> {
                 System.out.println("Opción inválida.");
                 yield Optional.empty();
@@ -35,7 +53,7 @@ public class ProductoService {
         return resultado;
     }
 
-    private Optional<Producto> buscarProductoPorId() {
+    private Optional<Producto> buscarProductoPorId() throws ProductoNoEncontradoException{
         System.out.println("Ingresar ID del producto:");
         String id = scanner.nextLine();
 
@@ -44,11 +62,12 @@ public class ProductoService {
                 return Optional.of(producto);
             }
         }
-        System.out.println("Producto no encontrado");
-        return Optional.empty();
+
+
+        throw new ProductoNoEncontradoException("Producto no encontrado");
     }
 
-    private Optional<Producto> buscarProductoPorNombre() {
+    private Optional<Producto> buscarProductoPorNombre() throws ProductoNoEncontradoException {
         System.out.println("Ingresar nombre de producto:");
         String nombre = scanner.nextLine();
 
@@ -57,11 +76,10 @@ public class ProductoService {
                 return Optional.of(producto);
             }
         }
-        System.out.println("Producto no encontrado");
-        return Optional.empty();
+        throw new ProductoNoEncontradoException("Producto no encontrado");
     }
 
-    private void menuAccionesProducto(Producto producto) {
+    private void menuAccionesProducto(Producto producto) throws EntradaInvalidaException {
         int opcion;
         do {
             System.out.println("\n✅ Producto encontrado: " + producto);
@@ -78,29 +96,47 @@ public class ProductoService {
                 opcion = -1;
             }
 
-            switch (opcion) {
-                case 1 -> {
-                    System.out.println("Nuevo precio:");
-                    double nuevoPrecio = Double.parseDouble(scanner.nextLine());
-                    producto.setPrecio(nuevoPrecio);
-                    System.out.println("Precio actualizado");
+            try {
+                switch (opcion) {
+                    case 1 -> {
+                        System.out.println("Nuevo precio:");
+                        String precioInput = scanner.nextLine();
+                        if (precioInput.isBlank() || !precioInput.matches("\\d+(\\.\\d+)?")) {
+                            throw new EntradaInvalidaException("Entrada inválida. Operación cancelada.");
+                        }
+                        double nuevoPrecio = Double.parseDouble(precioInput);
+                        if (nuevoPrecio < 0) {
+                            throw new EntradaInvalidaException("Entrada inválida. Operación cancelada.");
+                        }
+                        producto.setPrecio(nuevoPrecio);
+                        System.out.println("Precio actualizado");
+                    }
+                    case 2 -> {
+                        System.out.println("Nuevo stock:");
+                        String stockInput = scanner.nextLine();
+                        if (stockInput.isBlank() || !stockInput.matches("\\d+") || Integer.parseInt(stockInput) < 0) {
+                            throw new EntradaInvalidaException("Entrada inválida. Operación cancelada.");
+                        }
+                        int nuevoStock = Integer.parseInt(stockInput);
+                        producto.setStock(nuevoStock);
+                        System.out.println("Stock actualizado");
+                    }
+                    case 3 -> {
+                        productos.remove(producto);
+                        System.out.println("Producto eliminado");
+                        return;
+                    }
+                    case 0 -> System.out.println("Volviendo al menú");
+                    default -> System.out.println("Opción inválida.");
                 }
-                case 2 -> {
-                    System.out.println("Nuevo stock:");
-                    int nuevoStock = Integer.parseInt(scanner.nextLine());
-                    producto.setStock(nuevoStock);
-                    System.out.println("Stock actualizado");
-                }
-                case 3 -> {
-                    productos.remove(producto);
-                    System.out.println("Producto eliminado");
-                    return;
-                }
-                case 0 -> System.out.println("Volviendo al menú");
-                default -> System.out.println("Opción inválida.");
+            } catch (EntradaInvalidaException e) {
+                System.out.println(e.getMessage());
             }
         } while (opcion != 0);
+
+
     }
+
 
     public void listarProductos() {
         if (productos.isEmpty()) {
@@ -109,7 +145,7 @@ public class ProductoService {
         }
         System.out.println("--- Lista de productos ---");
         for (Producto producto : productos) {
-            System.out.println(producto);
+            System.out.println(producto.toString());
         }
     }
 
@@ -157,5 +193,9 @@ public class ProductoService {
         Producto nuevoProducto = new Producto(nombre, precio, stock);
         productos.add(nuevoProducto);
         System.out.println("Producto agregado exitosamente");
+    }
+
+    public Optional<Producto> obtenerPorId(String id) {
+        return productos.stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 }

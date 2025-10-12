@@ -12,15 +12,16 @@ public class Producto {
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
-        this.id = UUID.randomUUID().toString();
+        this.id = String.valueOf(System.currentTimeMillis());
     }
 
     public String getNombre() {
         return nombre;
     }
 
+    @Override
     public String toString() {
-        return String.format("Id: %d, Nombre: %s, Precio: %.2f, Stock: %d", id, nombre, precio, stock);
+        return String.format("Id: %s, Nombre: %s, Precio: %.2f, Stock: %d", id, nombre, precio, stock);
     }
 
     public void setNombre(String nombre) {

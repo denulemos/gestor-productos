@@ -1,19 +1,20 @@
+import com.techlab.excepciones.ProductoNoEncontradoException;
 import com.techlab.ordenes.OrdenService;
 import com.techlab.productos.ProductoService;
 
 import java.util.Scanner;
 
-public class GestorProductosApp {
+public class Main {
 
     private final Scanner in = new Scanner(System.in);
     private final ProductoService productoService = new ProductoService();
     private final OrdenService ordenService = new OrdenService();
 
-    public static void main(String[] args) {
-        new GestorProductosApp().run();
+    public static void main(String[] args) throws ProductoNoEncontradoException {
+        new Main().run();
     }
 
-    public void run() {
+    public void run() throws ProductoNoEncontradoException {
         String opcion;
         do {
             mostrarMenu();
@@ -45,7 +46,7 @@ public class GestorProductosApp {
         return input;
     }
 
-    private void manejarOpcion(String opcion) {
+    private void manejarOpcion(String opcion) throws ProductoNoEncontradoException {
         switch (opcion) {
             case "a":
                 productoService.agregarProductoOptionHandler();
@@ -54,10 +55,10 @@ public class GestorProductosApp {
                 productoService.listarProductos();
                 break;
             case "c":
-                buscarActualizarProducto();
+                productoService.buscarProducto();
                 break;
             case "d":
-                crearPedido();
+                ordenService.crearOrdenInteractivo(productoService);
                 break;
             case "e":
                 ordenService.listarOrdenes();

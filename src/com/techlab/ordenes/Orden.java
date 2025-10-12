@@ -1,32 +1,29 @@
 package com.techlab.ordenes;
 
-import com.techlab.productos.Producto;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class Orden {
     private int id;
-    private ArrayList<Producto> productos;
+    private ArrayList<OrdenItem> items = new ArrayList<>();
 
-    public Orden(int id, ArrayList<Producto> productos) {
+    public Orden(int id) {
         this.id = id;
-        this.productos = productos;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public List<OrdenItem> getItems() {
+        return items;
     }
 
-    public ArrayList<Producto> getProductos() {
-        return productos;
+    public void addItem(OrdenItem item) {
+        items.add(item);
     }
 
-    public void setProductos(ArrayList<Producto> productos) {
-        this.productos = productos;
+    public double getTotal() {
+        return items.stream().mapToDouble(OrdenItem::getSubtotal).sum();
     }
-
 }
