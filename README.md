@@ -20,8 +20,9 @@ Listar pedidos
 Salir
 ```
 
-TODO: 
+Mejoras TODO: 
 
 - Persistir informacion en un JSON o base de datos.
 - Manejar corner cases como eliminacion cuando producto se encuentra en orden, etc.
 - Agregar mas atributos a las entidades.
+- Manejar mas excepciones
