@@ -29,11 +29,14 @@ public class OrdenService {
     public void crearOrdenInteractivo(ProductoService productoService) {
         Orden orden = new Orden(secuenciaId++);
         System.out.println("Creación de orden. Ingrese productos. Escriba FIN para terminar.");
+
         while (true) {
             productoService.listarProductos();
             System.out.println("ID de producto (o FIN):");
             String idInput = scanner.nextLine().trim();
-            if (idInput.equalsIgnoreCase("FIN")) break;
+            if (idInput.equalsIgnoreCase("FIN")) {
+                break;
+            }
 
             var optProducto = productoService.obtenerPorId(idInput);
             if (optProducto.isEmpty()) {
