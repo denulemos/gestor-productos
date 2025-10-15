@@ -72,7 +72,7 @@ public class ProductoService {
         String nombre = scanner.nextLine();
 
         for (Producto producto : productos) {
-            if (producto.getNombre().equalsIgnoreCase(nombre)) { // usar equalsIgnoreCase
+            if (producto.getNombre().equalsIgnoreCase(nombre)) {
                 return Optional.of(producto);
             }
         }
